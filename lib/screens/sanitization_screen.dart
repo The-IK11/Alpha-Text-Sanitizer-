@@ -25,6 +25,10 @@ class _SanitizationScreenState extends State<SanitizationScreen> {
     _sanitizerService = SanitizerService();
     _inputController = TextEditingController();
     _outputController = TextEditingController();
+    // Load custom words from storage
+    _sanitizerService.loadFromStorage().then((_) {
+      setState(() {});
+    });
   }
 
   @override
@@ -854,16 +858,18 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
-                      onPressed: () {
-                        widget.sanitizerService
+                      onPressed: () async {
+                        await widget.sanitizerService
                             .setSanitizerSymbol(_symbolController.text);
                         widget.onSettingsChanged();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Symbol updated!'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Symbol updated!'),
+                              duration: Duration(seconds: 1),
+                            ),
+                          );
+                        }
                       },
                       child: const Text('Update'),
                     ),
@@ -894,9 +900,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (_newWordController.text.isNotEmpty) {
-                          widget.sanitizerService
+                          await widget.sanitizerService
                               .addRestrictedWord(_newWordController.text);
                           _newWordController.clear();
                           widget.onSettingsChanged();
@@ -934,8 +940,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
                         title: Text(word),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete_outline),
-                          onPressed: () {
-                            widget.sanitizerService.removeRestrictedWord(word);
+                          onPressed: () async {
+                            await widget.sanitizerService.removeRestrictedWord(word);
                             widget.onSettingsChanged();
                             setState(() {});
                           },

@@ -1,14 +1,63 @@
 import 'package:alpha_sanitizer/config/app_constants.dart';
 import 'package:alpha_sanitizer/models/sanitization_result.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Core sanitizer service that handles text sanitization
 class SanitizerService {
   late List<String> _restrictedWords;
   late String _sanitizerSymbol;
+  static const String _storageKey = 'custom_restricted_words';
+  static const String _symbolStorageKey = 'sanitizer_symbol';
 
   SanitizerService() {
     _restrictedWords = List.from(AppConstants.defaultRestrictedWords);
     _sanitizerSymbol = AppConstants.defaultSanitizerSymbol;
+  }
+
+  /// Load custom words and symbol from storage
+  Future<void> loadFromStorage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Load custom words
+      final customWords = prefs.getStringList(_storageKey) ?? [];
+      _restrictedWords = [
+        ...AppConstants.defaultRestrictedWords,
+        ...customWords,
+      ];
+      
+      // Load custom symbol
+      final customSymbol = prefs.getString(_symbolStorageKey);
+      if (customSymbol != null && customSymbol.isNotEmpty) {
+        _sanitizerSymbol = customSymbol;
+      }
+    } catch (e) {
+      print('Error loading from storage: $e');
+    }
+  }
+
+  /// Save custom words to storage
+  Future<void> _saveCustomWords() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      // Only save words that are not in the default list
+      final customWords = _restrictedWords
+          .where((word) => !AppConstants.defaultRestrictedWords.contains(word))
+          .toList();
+      await prefs.setStringList(_storageKey, customWords);
+    } catch (e) {
+      print('Error saving to storage: $e');
+    }
+  }
+
+  /// Save symbol to storage
+  Future<void> _saveSymbol() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_symbolStorageKey, _sanitizerSymbol);
+    } catch (e) {
+      print('Error saving symbol to storage: $e');
+    }
   }
 
   /// Get current restricted words list
@@ -18,21 +67,24 @@ class SanitizerService {
   String getSanitizerSymbol() => _sanitizerSymbol;
 
   /// Add a restricted word
-  void addRestrictedWord(String word) {
+  Future<void> addRestrictedWord(String word) async {
     if (word.isNotEmpty && !_restrictedWords.contains(word.toLowerCase())) {
       _restrictedWords.add(word.toLowerCase());
+      await _saveCustomWords();
     }
   }
 
   /// Remove a restricted word
-  void removeRestrictedWord(String word) {
+  Future<void> removeRestrictedWord(String word) async {
     _restrictedWords.removeWhere((w) => w.toLowerCase() == word.toLowerCase());
+    await _saveCustomWords();
   }
 
   /// Update sanitizer symbol
-  void setSanitizerSymbol(String symbol) {
+  Future<void> setSanitizerSymbol(String symbol) async {
     if (symbol.isNotEmpty) {
       _sanitizerSymbol = symbol;
+      await _saveSymbol();
     }
   }
 
