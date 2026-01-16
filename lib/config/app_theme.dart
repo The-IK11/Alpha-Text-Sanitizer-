@@ -46,19 +46,24 @@ class AppTheme {
       fillColor: lightSurface,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: lightBorder),
+        borderSide: const BorderSide(color: lightBorder, width: 1.5),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: lightBorder),
+        borderSide: const BorderSide(color: lightBorder, width: 1.5),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: lightPrimary, width: 2),
       ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: lightBorder, width: 1.5),
+      ),
       hintStyle: const TextStyle(color: lightTextSecondary, fontSize: 14),
       contentPadding: const EdgeInsets.all(16),
       labelStyle: const TextStyle(color: lightText),
+      floatingLabelStyle: const TextStyle(color: lightPrimary),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -125,19 +130,24 @@ class AppTheme {
       fillColor: darkSurface,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: darkBorder),
+        borderSide: const BorderSide(color: darkBorder, width: 1.5),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: darkBorder),
+        borderSide: const BorderSide(color: darkBorder, width: 1.5),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: darkPrimary, width: 2),
       ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: darkBorder, width: 1.5),
+      ),
       hintStyle: const TextStyle(color: darkTextSecondary, fontSize: 14),
       contentPadding: const EdgeInsets.all(16),
       labelStyle: const TextStyle(color: darkText),
+      floatingLabelStyle: const TextStyle(color: darkPrimary),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(

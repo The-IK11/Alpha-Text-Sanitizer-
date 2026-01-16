@@ -337,18 +337,26 @@ class _SanitizationScreenState extends State<SanitizationScreen> {
             maxLines: 10,
             minLines: 5,
             onChanged: (_) => setState(() {}),
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodyMedium?.color,
+            ),
             decoration: InputDecoration(
               hintText: 'Paste your text here...',
+              hintStyle: TextStyle(
+                color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: Theme.of(context).dividerColor,
+                  width: 1.5,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: Theme.of(context).primaryColor.withOpacity(0.3),
+                  width: 1.5,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -358,6 +366,8 @@ class _SanitizationScreenState extends State<SanitizationScreen> {
                   width: 2,
                 ),
               ),
+              filled: true,
+              fillColor: Theme.of(context).cardColor,
               counter: Padding(
                 padding: const EdgeInsets.only(top: 12),
                 child: Text(
@@ -428,22 +438,37 @@ class _SanitizationScreenState extends State<SanitizationScreen> {
             maxLines: 10,
             minLines: 5,
             readOnly: true,
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodyMedium?.color,
+            ),
             decoration: InputDecoration(
               hintText: 'Sanitized text will appear here...',
+              hintStyle: TextStyle(
+                color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: Theme.of(context).dividerColor,
+                  width: 1.5,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: Theme.of(context).primaryColor.withOpacity(0.3),
+                  width: 1.5,
+                ),
+              ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Theme.of(context).primaryColor.withOpacity(0.2),
+                  width: 1.5,
                 ),
               ),
               filled: true,
-              fillColor: Theme.of(context).primaryColor.withOpacity(0.05),
+              fillColor: Theme.of(context).primaryColor.withOpacity(0.03),
               counter: Padding(
                 padding: const EdgeInsets.only(top: 12),
                 child: Text(
