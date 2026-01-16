@@ -50,13 +50,30 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
-class _MainAppState extends State<MainApp> {
+class _MainAppState extends State<MainApp> with TickerProviderStateMixin {
+  late AnimationController _glowController;
+
+  @override
+  void initState() {
+    super.initState();
+    _glowController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _glowController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -64,58 +81,83 @@ class _MainAppState extends State<MainApp> {
               end: Alignment.bottomRight,
               colors: widget.isDarkMode
                   ? [
-                      const Color(0xFF1E1E1E),
-                      const Color(0xFF2A2A2A),
+                      const Color(0xFF0A47A8),
+                      const Color(0xFF1565C0),
+                      const Color(0xFF1976D2),
                     ]
                   : [
-                      Colors.white,
-                      const Color(0xFFF5F5F5),
+                      Colors.blue.shade400,
+                      Colors.blue.shade500,
+                      Colors.blue.shade600,
                     ],
+              stops: const [0.0, 0.5, 1.0],
             ),
             boxShadow: [
               BoxShadow(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+                color: Theme.of(context).primaryColor.withOpacity(0.3),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+                spreadRadius: 2,
               ),
             ],
           ),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Alpha Text Sanitizer',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
+        title: AnimatedBuilder(
+          animation: _glowController,
+          builder: (context, child) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ShaderMask(
+                  shaderCallback: (bounds) {
+                    return LinearGradient(
+                      colors: [
+                        Colors.white,
+                        Colors.white.withOpacity(0.5 + (_glowController.value * 0.5)),
+                        Colors.white,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ).createShader(bounds);
+                  },
+                  child: Text(
+                    'Alpha Text Sanitizer',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
                   ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Clean your text for freelance platforms',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontSize: 12,
-                  ),
-            ),
-          ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Clean your text for freelance platforms',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontSize: 12,
+                        color: Colors.white.withOpacity(0.9),
+                        letterSpacing: 0.2,
+                      ),
+                ),
+              ],
+            );
+          },
         ),
         actions: [
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: widget.isDarkMode
-                    ? [
-                        Theme.of(context).primaryColor,
-                        Theme.of(context).primaryColor.withOpacity(0.8),
-                      ]
-                    : [
-                        Theme.of(context).primaryColor,
-                        const Color(0xFF1976D2),
-                      ],
+                colors: [
+                  Colors.white.withOpacity(0.2),
+                  Colors.white.withOpacity(0.1),
+                ],
               ),
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.3),
+                width: 1.5,
+              ),
             ),
             child: IconButton(
               icon: Icon(

@@ -75,10 +75,10 @@ class SanitizerService {
 
       if (count > 0) {
         detectedWords[word] = count;
-        // Replace with sanitized version (word with hyphen in between letters)
-        sanitized = sanitized.replaceAll(
+        // Replace with sanitized version while preserving original case
+        sanitized = sanitized.replaceAllMapped(
           pattern,
-          _applySanitization(word),
+          (match) => _applySanitizationWithCase(match.group(0)!),
         );
       }
     }
@@ -90,10 +90,10 @@ class SanitizerService {
     );
   }
 
-  /// Apply sanitization to a single word using intelligent hyphen placement
+  /// Apply sanitization to a single word while preserving original case
   /// Adds hyphen after every 2 characters for consistent obfuscation
-  /// Examples: "pay" -> "pa-y", "payment" -> "pa-ym-ent", "cospayment" -> "cospa-ym-ent"
-  String _applySanitization(String word) {
+  /// Examples: "pay" -> "pa-y", "PAYMENT" -> "PA-YM-EN-T", "PayMent" -> "Pa-yM-en-t"
+  String _applySanitizationWithCase(String word) {
     if (word.isEmpty) return word;
     if (word.length <= 2) {
       return word; // No hyphen for very short words
@@ -102,7 +102,7 @@ class SanitizerService {
     List<String> chars = word.split('');
     List<String> result = [];
     
-    // Add hyphen after every 2 characters
+    // Add hyphen after every 2 characters, preserving original case
     for (int i = 0; i < chars.length; i++) {
       result.add(chars[i]);
       // Add hyphen after every 2 characters (but not at the end)

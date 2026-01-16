@@ -83,6 +83,7 @@ class _SanitizationScreenState extends State<SanitizationScreen> {
   }
 
   /// Build sanitized versions of detected words by adding hyphen after every 2 letters
+  /// This is used for highlighting and must match the actual sanitization logic
   List<String> _buildSanitizedWords(List<String> detectedWords) {
     List<String> sanitized = [];
     for (String word in detectedWords) {
@@ -202,6 +203,11 @@ class _SanitizationScreenState extends State<SanitizationScreen> {
           const SizedBox(height: 20),
           _buildStatisticsSection(),
         ],
+
+        // Footer - Trademark
+        const SizedBox(height: 40),
+        _buildFooter(),
+        const SizedBox(height: 20),
       ],
     );
   }
@@ -699,6 +705,57 @@ class _SanitizationScreenState extends State<SanitizationScreen> {
                   count: entry.value,
                 ))
                 .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build footer with trademark
+  Widget _buildFooter() {
+    return Center(
+      child: Column(
+        children: [
+          Divider(
+            color: Theme.of(context).dividerColor.withOpacity(0.3),
+            thickness: 1,
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.flutter_dash,
+                size: 18,
+                color: Theme.of(context).primaryColor,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Made with Flutter by ',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
+                  fontSize: 12,
+                ),
+              ),
+              ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  colors: [
+                    Theme.of(context).primaryColor,
+                    Theme.of(context).primaryColor.withOpacity(0.6),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ).createShader(bounds),
+                child: Text(
+                  'TheIK11',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
