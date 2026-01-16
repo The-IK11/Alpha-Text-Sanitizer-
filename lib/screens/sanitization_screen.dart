@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:alpha_sanitizer/config/app_constants.dart';
 import 'package:alpha_sanitizer/models/sanitization_result.dart';
 import 'package:alpha_sanitizer/services/sanitizer_service.dart';
 import 'package:alpha_sanitizer/widgets/custom_widgets.dart';
+import 'package:alpha_sanitizer/widgets/highlighted_text_display.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SanitizationScreen extends StatefulWidget {
   const SanitizationScreen({Key? key}) : super(key: key);
@@ -79,6 +80,23 @@ class _SanitizationScreenState extends State<SanitizationScreen> {
         },
       ),
     );
+  }
+
+  /// Build sanitized versions of detected words (e.g., "payment" -> "p-a-y-m-e-n-t")
+  List<String> _buildSanitizedWords(List<String> detectedWords) {
+    List<String> sanitized = [];
+    for (String word in detectedWords) {
+      List<String> chars = word.split('');
+      List<String> result = [];
+      for (int i = 0; i < chars.length; i++) {
+        result.add(chars[i]);
+        if (i < chars.length - 1) {
+          result.add('-');
+        }
+      }
+      sanitized.add(result.join());
+    }
+    return sanitized;
   }
 
   @override
@@ -433,54 +451,92 @@ class _SanitizationScreenState extends State<SanitizationScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          TextField(
-            controller: _outputController,
-            maxLines: 10,
-            minLines: 5,
-            readOnly: true,
-            style: TextStyle(
-              color: Theme.of(context).textTheme.bodyMedium?.color,
-            ),
-            decoration: InputDecoration(
-              hintText: 'Sanitized text will appear here...',
-              hintStyle: TextStyle(
-                color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Theme.of(context).dividerColor,
-                  width: 1.5,
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
+          // Output display with highlighted detected words
+          if (_lastResult?.hasRestrictedWords ?? false)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(
                   color: Theme.of(context).primaryColor.withOpacity(0.3),
                   width: 1.5,
                 ),
-              ),
-              disabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Theme.of(context).primaryColor.withOpacity(0.2),
-                  width: 1.5,
+                color: Theme.of(context).primaryColor.withOpacity(0.03),
+              ),
+              child: SingleChildScrollView(
+                child: HighlightedTextDisplay(
+                  text: _outputController.text,
+                  highlightWords: _buildSanitizedWords(_lastResult?.detectedWords.keys.toList() ?? []),
+                  highlightColor: Colors.red,
+                  baseStyle: TextStyle(
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                    fontSize: 16,
+                    height: 1.5,
+                  ),
                 ),
               ),
-              filled: true,
-              fillColor: Theme.of(context).primaryColor.withOpacity(0.03),
-              counter: Padding(
-                padding: const EdgeInsets.only(top: 12),
-                child: Text(
-                  '${_outputController.text.length} characters',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.w600,
+            )
+          else
+            TextField(
+              controller: _outputController,
+              maxLines: 10,
+              minLines: 5,
+              readOnly: true,
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Sanitized text will appear here...',
+                hintStyle: TextStyle(
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 1.5,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Theme.of(context).primaryColor.withOpacity(0.3),
+                    width: 1.5,
+                  ),
+                ),
+                disabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Theme.of(context).primaryColor.withOpacity(0.2),
+                    width: 1.5,
+                  ),
+                ),
+                filled: true,
+                fillColor: Theme.of(context).primaryColor.withOpacity(0.03),
+                counter: Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Text(
+                    '${_outputController.text.length} characters',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          if (_lastResult?.hasRestrictedWords ?? false)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Text(
+                '${_outputController.text.length} characters',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
         ],
       ),
     );
