@@ -82,15 +82,22 @@ class _SanitizationScreenState extends State<SanitizationScreen> {
     );
   }
 
-  /// Build sanitized versions of detected words (e.g., "payment" -> "p-a-y-m-e-n-t")
+  /// Build sanitized versions of detected words by adding hyphen after every 2 letters
   List<String> _buildSanitizedWords(List<String> detectedWords) {
     List<String> sanitized = [];
     for (String word in detectedWords) {
+      if (word.isEmpty || word.length <= 2) {
+        sanitized.add(word);
+        continue;
+      }
+
       List<String> chars = word.split('');
       List<String> result = [];
+      
+      // Add hyphen after every 2 characters
       for (int i = 0; i < chars.length; i++) {
         result.add(chars[i]);
-        if (i < chars.length - 1) {
+        if ((i + 1) % 2 == 0 && i < chars.length - 1) {
           result.add('-');
         }
       }

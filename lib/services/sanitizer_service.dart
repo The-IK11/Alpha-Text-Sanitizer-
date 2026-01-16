@@ -62,9 +62,9 @@ class SanitizerService {
 
     // Process each restricted word
     for (String word in _restrictedWords) {
-      // Case-insensitive regex pattern
+      // Case-insensitive regex pattern (without word boundaries to catch words within words)
       final pattern = RegExp(
-        r'\b' + RegExp.escape(word) + r'\b',
+        RegExp.escape(word),
         caseSensitive: false,
         multiLine: true,
       );
@@ -90,17 +90,23 @@ class SanitizerService {
     );
   }
 
-  /// Apply sanitization to a single word using the configured symbol
+  /// Apply sanitization to a single word using intelligent hyphen placement
+  /// Adds hyphen after every 2 characters for consistent obfuscation
+  /// Examples: "pay" -> "pa-y", "payment" -> "pa-ym-ent", "cospayment" -> "cospa-ym-ent"
   String _applySanitization(String word) {
     if (word.isEmpty) return word;
+    if (word.length <= 2) {
+      return word; // No hyphen for very short words
+    }
 
-    // Insert symbol between every character or every other character
     List<String> chars = word.split('');
     List<String> result = [];
-
+    
+    // Add hyphen after every 2 characters
     for (int i = 0; i < chars.length; i++) {
       result.add(chars[i]);
-      if (i < chars.length - 1) {
+      // Add hyphen after every 2 characters (but not at the end)
+      if ((i + 1) % 2 == 0 && i < chars.length - 1) {
         result.add(_sanitizerSymbol);
       }
     }
